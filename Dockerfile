@@ -15,6 +15,7 @@
 # Run: 
 #   docker run -h nginx7 --name nginx7 -p 2200:22 -p 80:80 -p 443:443 -d kanalfred/nginx7 
 #   docker run -h nginx7 --name nginx7 -p 2200:22 -p 80:80 -p 443:443 -d -v /data/nginx/etc/nginx/conf.d:/etc/nginx/conf.d -v /data/nginx/var/www/apple:/var/www/apple -v /data/nginx/var/www/wvpn:/var/www/wvpn kanalfred/nginx7
+#   docker run -h nginx7 --name nginx7 -p 2200:22 -p 80:80 -p 443:443 -d -v /data/nginx/data:/data kanalfred/nginx7
 #
 ###################################
 
@@ -23,9 +24,14 @@ FROM kanalfred/centos7:latest
 MAINTAINER Alfred Kan <kanalfred@gmail.com>
 
 # Add Files
-#ADD container-files/conf/nginx.repo /etc/yum.repos.d/
-#ADD container-files/rpm/remi-release-7.rpm /tmp/
 ADD container-files /
+
+# User
+RUN adduser --uid 1000 hostadmin \
+        && cat /root/hostadmin.txt | passwd hostadmin --stdin
+
+#RUN mkdir /data
+VOLUME ["/data"]
 
 # PHP7
 RUN \
@@ -82,7 +88,13 @@ RUN \
 
 RUN \
     # Install nginx
-    yum install -y nginx
+    yum install -y nginx && \
+
+    # Add user hostadmin to groups
+    usermod -a -G nginx hostadmin && \
+    usermod -a -G apache hostadmin
+
+ADD container-files /
 
 # Wrap up
 RUN \
@@ -90,13 +102,16 @@ RUN \
     #chkconfig nginx on && \
     #chkconfig php70-php-fpm on && \
 
+    # Remove pass file
+    rm -f /root/hostadmin.txt && \
+
     # Clean YUM caches to minimise Docker image size... 
     yum clean all && rm -rf /tmp/yum*
 
-ADD container-files /
 
 EXPOSE 80 443
 
 # start all register services
 #CMD ["/sbin/init", "-D"]
+CMD ["/config/run.sh"]
 
