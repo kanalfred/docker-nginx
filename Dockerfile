@@ -10,12 +10,16 @@
 #    http://tecadmin.net/install-php-7-nginx-mysql-5-on-centos/
 #    https://github.com/million12/docker-nginx-php
 #    https://github.com/million12/docker-nginx
+#    Nginx tuning
+#    https://github.com/iiiepe/docker-nginx-drupal6
+#    https://hub.docker.com/r/iiiepe/nginx-drupal6
 # Build
 #    docker build -t kanalfred/nginx .
 # Run: 
 #   docker run -h nginx7 --name nginx7 -p 2200:22 -p 80:80 -p 443:443 -d kanalfred/nginx7 
 #   docker run -h nginx7 --name nginx7 -p 2200:22 -p 80:80 -p 443:443 -d -v /data/nginx/etc/nginx/conf.d:/etc/nginx/conf.d -v /data/nginx/var/www/apple:/var/www/apple -v /data/nginx/var/www/wvpn:/var/www/wvpn kanalfred/nginx7
 #   docker run -h nginx7 --name nginx7 -p 2200:22 -p 80:80 -p 443:443 -d -v /data/nginx/data:/data kanalfred/nginx7
+#   docker run -e 'apple=asfa!sdfaboy!' -h nginx7 --name nginx7 -p 2200:22 -p 80:80 -p 443:443 -d -v /data/nginx/data:/data kanalfred/nginx7
 #
 ###################################
 
