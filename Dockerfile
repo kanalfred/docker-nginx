@@ -87,8 +87,7 @@ RUN \
     echo 'PHP 7 installed.' 
 
 # Ngnix
-#COPY container-files/conf/supervisord/nginx.conf /etc/supervisor.d/nginx.conf
-#COPY container-files/conf/supervisord/php-fpm.conf /etc/supervisor.d/php-fpm.conf
+ENV DOCKERIZE_VERSION v0.2.0
 
 RUN \
     # Install nginx
@@ -96,16 +95,16 @@ RUN \
 
     # Add user hostadmin to groups
     usermod -a -G nginx hostadmin && \
-    usermod -a -G apache hostadmin
+    usermod -a -G apache hostadmin && \
+    
+    # Install dockerize - replace env var in config file
+    wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz	
 
 ADD container-files /
 
 # Wrap up
 RUN \
-    # Enable service
-    #chkconfig nginx on && \
-    #chkconfig php70-php-fpm on && \
-
     # Remove pass file
     rm -f /root/hostadmin.txt && \
 
@@ -116,6 +115,6 @@ RUN \
 EXPOSE 80 443
 
 # start all register services
-#CMD ["/sbin/init", "-D"]
-CMD ["/config/run.sh"]
+CMD dockerize -template /tmp/test.conf:/tmp/test.conf /config/run.sh
+#CMD ["/config/run.sh"]
 
