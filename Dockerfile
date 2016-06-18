@@ -14,7 +14,7 @@
 #    https://github.com/iiiepe/docker-nginx-drupal6
 #    https://hub.docker.com/r/iiiepe/nginx-drupal6
 # Build
-#    docker build -t kanalfred/nginx .
+#    docker build -t kanalfred/nginx7 .
 # Run: 
 #   docker run -h nginx7 --name nginx7 -p 2200:22 -p 80:80 -p 443:443 -d kanalfred/nginx7 
 #   docker run -h nginx7 --name nginx7 -p 2200:22 -p 80:80 -p 443:443 -d -v /data/nginx/etc/nginx/conf.d:/etc/nginx/conf.d -v /data/nginx/var/www/apple:/var/www/apple -v /data/nginx/var/www/wvpn:/var/www/wvpn kanalfred/nginx7
@@ -83,11 +83,15 @@ RUN \
     # Move PHP config files from /etc/opt/remi/php70/* to /etc/* 
     mv -f /etc/opt/remi/php70/php.ini /etc/php.ini && ln -s /etc/php.ini /etc/opt/remi/php70/php.ini && \
     rm -rf /etc/php.d && mv /etc/opt/remi/php70/php.d /etc/. && ln -s /etc/php.d /etc/opt/remi/php70/php.d && \
-
-    echo 'PHP 7 installed.' 
+    echo 'PHP 7 installed.' && \
+	
+    # Install Composer
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    chown hostadmin /usr/local/bin/composer && composer --version && \
+    composer config -g secure-http false
 
 # Ngnix
-ENV DOCKERIZE_VERSION v0.2.0
+#ENV DOCKERIZE_VERSION v0.2.0
 
 RUN \
     # Install nginx
@@ -95,11 +99,11 @@ RUN \
 
     # Add user hostadmin to groups
     usermod -a -G nginx hostadmin && \
-    usermod -a -G apache hostadmin && \
+    usermod -a -G apache hostadmin
     
     # Install dockerize - replace env var in config file
-    wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz	
+    #wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    #&& tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz	
 
 ADD container-files /
 
